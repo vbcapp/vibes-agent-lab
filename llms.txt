@@ -1,0 +1,7 @@
+# Vibes Agent Lab
+
+> 給 AI Agent 讀、讓 Agent 照著做的開源工具與教學。每篇都有純文字版，直接讀 guide.txt 即可。
+
+## 教學
+
+- [部署收工按鈕（Claude Code mod）](https://lab.vibes.com.tw/claude-mods/deploy-button/guide.txt)：按一下派便宜的子 Agent 補專案紀錄，再照專案原本方式本機存檔、推送或部署；有問題才回報。

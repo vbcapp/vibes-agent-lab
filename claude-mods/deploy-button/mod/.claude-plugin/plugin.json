@@ -1,0 +1,7 @@
+{
+  "name": "deploy-button",
+  "version": "1.0.0",
+  "description": "「部署收工」按鈕：派便宜的子 Agent 先補專案紀錄，再照專案原本的方式存檔或部署；附「部署紀錄」面板",
+  "types": "./types/index.d.ts",
+  "license": "MIT"
+}

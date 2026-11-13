@@ -1,0 +1,7 @@
+title: Vibes Agent Lab
+description: 給 AI Agent 讀、讓 Agent 照著做的開源工具與教學
+theme: jekyll-theme-primer
+lang: zh-TW
+exclude:
+  - scripts
+  - "**/GUIDE.src.md"
