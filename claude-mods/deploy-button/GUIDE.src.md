@@ -4,7 +4,7 @@
 >
 > **給人看**：你不用自己讀程式碼。把這個網址貼給你的 Claude Code，說「照這份教學幫我做部署收工按鈕」就好。
 
-- 版本：1.0.0（2026-11-13）
+- 版本：1.1.0（2026-11-13，加入「部署單位」判斷）
 - 實測環境：Claude Code 2.1.321（macOS 桌面版 Code 分頁）
 - 授權：MIT
 
@@ -33,17 +33,22 @@
 
 ### 部署方式怎麼判斷
 
-子 Agent 依序看三個地方，只會「沿用」，不會發明新的部署方式：
+關鍵觀念是「**部署單位**」：一個大的 Git 儲存庫裡常常有很多小專案，各自有自己的部署方式（例如某個子資料夾裡的部署腳本）。儲存庫最上層沒有遠端，不代表不用部署。
 
-1. 專案文件（`AGENTS.md`、`CLAUDE.md`、README、進度頁）寫的部署規則，特別是「正式站要確認」「不要部署」這類字眼。
-2. 設定檔：`wrangler.toml`／`wrangler.jsonc`（Cloudflare）、`vercel.json`／`.vercel`、`netlify.toml`、`firebase.json`、`package.json` 的 deploy 指令、`.github/workflows`。
-3. `git remote -v` 與目前分支有沒有追蹤遠端。
+子 Agent 對每個改過的檔案，從**它所在的資料夾一層一層往上找**到儲存庫根目錄，每一層都看：
+
+1. 部署腳本或設定：檔名含「部署／deploy／publish／上線」的腳本、`wrangler.toml`／`wrangler.jsonc`（Cloudflare）、`vercel.json`／`.vercel`、`netlify.toml`、`firebase.json`、`package.json` 的 deploy 指令、`.github/workflows`。
+2. 同一層的說明文件：搜尋「部署」「網路版」「上線」「重新跑」「workers.dev」「pages.dev」等字，讀懂什麼情況要重新部署；也注意「正式站要確認」「不要部署」這類字眼。
+
+最靠近檔案的部署方式就是它的部署單位，同一個單位只部署一次。另外再看 `git remote -v` 與分支有沒有追蹤遠端，決定要不要 push。只會「沿用」，不會發明新的部署方式。
+
+> 這條規則是實際踩坑後加的：第一版只看儲存庫最上層，結果一個子資料夾裡明明有部署腳本、說明也寫「改了要重新部署」，子 Agent 卻只做了本機存檔。
 
 | 判斷結果 | 子 Agent 做的事 |
 |---|---|
-| 只有本機 Git | 只在本機 `git commit` |
+| 部署單位找不到部署方式、儲存庫也沒有遠端 | 只在本機 `git commit`，並註明「沒找到部署方式」 |
 | 有追蹤的遠端 | commit 後 `git push` 到原本的分支 |
-| 有部署設定或指令 | commit（有遠端就 push）後，用原本那條指令部署 |
+| 有部署設定、腳本或指令（根目錄或子資料夾都算） | commit（有遠端就 push）後，用原本那條指令部署，確認成功才回報 |
 | 文件寫明要使用者確認 | 只 commit，不部署，回報「要你處理」 |
 | 開關 `ALLOW_REMOTE = false`（預設） | 不管上面哪種，都只在本機 commit，回報本來會推／部署什麼 |
 
